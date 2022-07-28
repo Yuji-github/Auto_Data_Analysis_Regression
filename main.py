@@ -3,6 +3,10 @@ import pandas as pd
 import numpy as np
 import os
 import py7zr
+from writer import write
+import preprocess
+from reader import open
+
 
 if __name__ == "__main__":
 
@@ -33,7 +37,7 @@ if __name__ == "__main__":
         print("Example: -T Target")
         exit()
 
-    remove = args.Remove
+    remove = np.array(args.Remove).flatten()
     if remove is None:
         print("There is no remove column")
         print("Would you like to add some columns you want to remove?")
@@ -57,7 +61,11 @@ if __name__ == "__main__":
 
     df = []
     for itr in input_path:
-        if 'csv' in itr:
+        if os.path.getsize(itr) > 10000000:
+            print("Given Dataset Over 10MB")
+            print("Skip to Import: " + str(itr))
+
+        elif 'csv' in itr:
             temp = pd.read_csv(itr)
             if args.Transpose == True:  # if transpose is True
                 temp = temp.T
@@ -66,22 +74,55 @@ if __name__ == "__main__":
         elif 'xlsx' in itr:
             sheet_name = []
             print("Enter Sheet Name\n")
-            ans = str(input("Name\n"))
+            sheet = str(input())
 
-            if ans == "":
-                sheet_name.append(0)
-            else:
+            if sheet == "":
+                temp = pd.read_excel(itr, header=0)
+                if args.Transpose == True:  # if transpose is True
+                    temp = temp.T
+                df.append(temp)
+
+            elif sheet != "":
+                sheet_name.append(sheet)
+                ans = "y"
                 while ans == 'y':
-                    val = str(input("Enter Sheet Name\n"))
-                    sheet_name.append(val)
                     print("Would you like to add more sheet name?")
                     ans = input("y or n\n")
                     ans = str(ans).lower()
+                    if ans == "y":
+                        val = str(input("Enter Sheet Name\n"))
+                        sheet_name.append(val)
+
                 print("Received Those Sheet Names: ", sheet_name)
 
-            temp = pd.read_excel(itr, sheet_name=sheet_name)
-            if args.Transpose == True:  # if transpose is True
-                temp = temp.T
-            df.append(temp)
+                try:
+                    temp = pd.read_excel(itr, sheet_name=sheet_name, header=0)
+                except ValueError:
+                    print("Something Wrong with Given Name(s)")
+                    print("Imported the First Sheet Only")
+                    temp = pd.read_excel(itr, header=0)
+
+                    if args.Transpose == True:  # if transpose is True
+                        temp = temp.T
+                    df.append(temp)
+
+    if len(df) == 0:
+        print("There is No Datasets to Analyze")
+        print("Please Make Sure: Datasets are less than 10MB")
+        exit()
 
     print("Imported {:d} DataFrame(s)\n" .format(len(df)))
+
+    print("---Removing Unnecessary Column(s) From Dataset(s)---\n")
+
+    for idx, val in enumerate(df):
+        if any(item in remove for item in list(val.columns)):  # found unnecessary column
+            for eraser in remove:
+                df[idx] = val.drop(eraser, axis=1)
+
+    # PreProcessing
+    print("PreProcess: Searching Missing Values")
+    output = preprocess.miss(df[0])
+
+    write("miss", output)
+    open()
