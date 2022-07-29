@@ -121,8 +121,11 @@ if __name__ == "__main__":
                 df[idx] = val.drop(eraser, axis=1)
 
     # PreProcessing
-    print("PreProcess: Searching Missing Values")
-    output, new_df = preprocess.miss(df[0])
+    print("PreProcess: Searching Missing Values and Filling Them")
+    new_df = preprocess.miss(df[0])
+
+    print("PreProcess: Describing The Datasets")
+    output = preprocess.describe(new_df)
 
     fileName = str(input_path[0]).replace('.csv', '').replace('.xlsx', '')  # remove extension
     write(fileName, output)

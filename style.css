@@ -11,6 +11,13 @@
   width: 25%;
 }
 
+.ds {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
 .table_center {
   margin-left: auto;
   margin-right: auto;
