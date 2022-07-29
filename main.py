@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     parse = argparse.ArgumentParser()
     parse.add_argument("--InputFile", "-I", help="Input File Name", nargs='+', action='append')  # assume multiple files
-    parse.add_argument("--Target", "-T", help="Target Column Name")  # assume 1 target column
+    parse.add_argument("--Target", "-T", help="Target Column Name", nargs='+', action='append')  # assume 1 target for each dataset
     parse.add_argument("--Remove", "-R", nargs='+', action='append', help="Remove Column Name")  # assume multiple columns
     parse.add_argument("--Transpose", "-TR", default=False, help="Transpose Dataset: Default is False")  # if datasets needs transpose, this should be True
 
@@ -31,8 +31,8 @@ if __name__ == "__main__":
             print("Example: -I ./folder/FileName.csv")
             exit()
 
-    target = str(args.Target)
-    if "None" in target:
+    target = np.array(args.Target).flatten()
+    if len(target) == 0:
         print("Target is Not given, Please Provide a Target Column Name")
         print("Example: -T Target")
         exit()
@@ -122,7 +122,8 @@ if __name__ == "__main__":
 
     # PreProcessing
     print("PreProcess: Searching Missing Values")
-    output = preprocess.miss(df[0])
+    output, new_df = preprocess.miss(df[0])
 
-    write("miss", output)
-    open()
+    fileName = str(input_path[0]).replace('.csv', '').replace('.xlsx', '')  # remove extension
+    write(fileName, output)
+    open(fileName)
