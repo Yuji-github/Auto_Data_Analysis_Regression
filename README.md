@@ -1,5 +1,5 @@
-# Auto_Data_Analysis_Classification
-Automatically analyzed instance classification data to help select the optimal model.
+# Auto_Data_Analysis_Regression
+Automatically analyzed instance regression data to help select the optimal model.
 
 ## Requirnents
 
