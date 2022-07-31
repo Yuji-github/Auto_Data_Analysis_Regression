@@ -5,6 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.impute import KNNImputer
 from sklearn.impute import SimpleImputer
 import seaborn as sns
+from scipy.stats.mstats import winsorize
 
 output = '' # global
 
@@ -102,10 +103,10 @@ def miss(df): # count num of missing values
 
     return df  # return new dataset
 
-def describe(df): # count num of describe df
+def describe(df, target): # count num of describe df
     desc = df.describe()
-    global output
 
+    global output
     # creating a table
     if desc.shape[1] > 0:
         # add ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']
@@ -150,8 +151,7 @@ def describe(df): # count num of describe df
                                desc.values.T[idx][4], desc.values.T[idx][5],
                                desc.values.T[idx][6], desc.values.T[idx][7])
         output+="""                
-               </table>
-               </section>                    
+               </table>                   
                """
 
     else:  # No descriptive statistics
@@ -159,8 +159,23 @@ def describe(df): # count num of describe df
                 <section class="card">
                 <h1 id="h1">Descriptive Statistics</h1>
                 <h2>Sorry, No Numerical Information in the Dataset</h2> 
-                </section>                                       
+                <br>
                 """
+
+    # create box plot for target
+    df.boxplot(target)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig("box_target.png")
+    plt.close()
+
+    output+='''              
+           <h2>Visualization</h2>  
+           <p> Box Plot: {:s}</p>
+           <img src="box_target.png" alt="boxplot" class="img"> 
+           </section>                       
+           '''.format(target)
+
     return output
 
 def correlation(df, target):
@@ -232,19 +247,89 @@ def correlation(df, target):
             '''
 
     if len(corr_list) == 0:
-        output += '''
-        <p> All columns do not relate to {:s} </p>
-        </section>
-        '''.format(target)
+        output+='''
+                <p> All columns do not relate to {:s} </p>
+                </section>
+                '''.format(target)
 
     else:
-        output += '''
-        <p> {:d} columns relate to {:s} </p>
-        <p> Because those go beyond thresholds (more than moderate) </p>
-        </section>
-        '''.format(len(corr_list), target)
+        output+='''
+                <p> {:d} columns relate to {:s} </p>
+                <p> Because those go beyond thresholds (more than moderate) </p>
+                </section>
+                '''.format(len(corr_list), target)
 
     return output, corr_list
 
-def outlier(df, target):
-    pass
+def outlier(df, target, corr_lis=None):
+    df = df.drop(target, 1)  # drop target
+
+    if len(corr_lis) < df.columns.size:  # the columns have correlations
+        df = df[df.columns.intersection(corr_lis)]  # extract the intersections
+
+    df.boxplot(column=list(df.columns.values))
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig("box_columns.png")
+    plt.close()
+
+    global output
+
+    output+='''
+            <section class="card">
+            <h1 id="h1">Outliers</h1>
+            <h2>Visualization</h2>  
+            <p> Side-by-Side Box Plots</p>
+            <img src="box_columns.png" alt="side_by_side" class="img">                   
+            '''.format(target)
+
+    # count outliers
+    Q1 = df.quantile(0.25)
+    Q3 = df.quantile(0.75)
+    IQR = Q3 - Q1
+
+    up = (df > (Q3 + 1.5 * IQR)).sum()
+    down = (df < (Q1 - 1.5 * IQR)).sum()
+
+    outers = ((df < (Q1 - 1.5 * IQR)) | (df > (Q3 + 1.5 * IQR))).sum()
+
+    output+='''
+            <h2>Descriptive Results</h2> 
+            <p> {:.3f} Percent of Data is Outliers </p>
+            '''.format((outers.sum()/df.size))
+
+    if (outers.sum()/df.size) > 0.05:  # more than 5% data is outliers
+        win = [down.sum()/df.size, up.sum()/df.size]
+
+        for col in df.columns[:-1]:
+            df[col] = winsorize(df[col], limits=win)
+
+        output+='''               
+              <p> Applied Winsorizing </p>
+              <table class="table_center"> 
+              <tr>
+              <th>Bottom</th>
+              <th>Top</th>
+              </tr>  
+              <tr>
+              <td>{:2f} %</td>
+              <td>{:2f} %</td>    
+              </tr>
+              </table>
+              '''.format(win[0]*100, win[1]*100)
+
+        df.boxplot(column=list(df.columns.values))
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.savefig("box_columns_outer.png")
+        plt.close()
+        output+='''
+                <p> After Winsorizing </p>
+                <img src="box_columns_outer.png" alt="side_by_side" class="img">
+                '''
+
+    output+='''
+            </section>  
+            '''
+
+    return output, df

@@ -6,6 +6,8 @@ import py7zr
 from writer import write
 import preprocess
 from reader import open
+import model
+
 
 if __name__ == "__main__":
 
@@ -125,16 +127,23 @@ if __name__ == "__main__":
                 elif np.where(df[idx].columns.values == eraser):
                     df[idx].drop(df[idx].columns[np.where(df[idx].columns.values == eraser)[0]], axis=1, inplace=True)
 
+    this_target = str(target[0])
+    print("---PreProcessing---\n")
+
     # PreProcessing
-    print("PreProcess: Searching Missing Values and Filling Them")
+    print("PreProcess: Searching Missing Values and Filling Them\n")
     new_df = preprocess.miss(df[0])
 
-    print("PreProcess: Describing The Datasets")
-    output = preprocess.describe(new_df)
+    print("PreProcess: Describing The Datasets\n")
+    output = preprocess.describe(new_df, this_target)
 
-    print("PreProcess: Finding Correlations")
-    this_target = target[0]
-    output, corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), str(this_target))
+    print("PreProcess: Finding Correlations\n")
+    output, corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target)
+
+    print("PreProcess: Handling Outliers\n")
+    columns = list(new_df.columns.values)
+    columns.remove(this_target)
+    output, final_df = preprocess.outlier(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target, corr_list if corr_list else columns)
 
     fileName = str(input_path[0]).replace('.csv', '').replace('.xlsx', '')  # remove extension
     write(fileName, output)
