@@ -7,7 +7,6 @@ from writer import write
 import preprocess
 from reader import open
 
-
 if __name__ == "__main__":
 
     print("\nThis indicates an optimal machine learning model.\n"
@@ -16,9 +15,12 @@ if __name__ == "__main__":
 
     parse = argparse.ArgumentParser()
     parse.add_argument("--InputFile", "-I", help="Input File Name", nargs='+', action='append')  # assume multiple files
-    parse.add_argument("--Target", "-T", help="Target Column Name", nargs='+', action='append')  # assume 1 target for each dataset
-    parse.add_argument("--Remove", "-R", nargs='+', action='append', help="Remove Column Name")  # assume multiple columns
-    parse.add_argument("--Transpose", "-TR", default=False, help="Transpose Dataset: Default is False")  # if datasets needs transpose, this should be True
+    parse.add_argument("--Target", "-T", help="Target Column Name", nargs='+',
+                       action='append')  # assume 1 target for each dataset
+    parse.add_argument("--Remove", "-R", nargs='+', action='append',
+                       help="Remove Column Name")  # assume multiple columns
+    parse.add_argument("--Transpose", "-TR", default=False,
+                       help="Transpose Dataset: Default is False")  # if datasets needs transpose, this should be True
 
     # args
     args = parse.parse_args()
@@ -111,14 +113,17 @@ if __name__ == "__main__":
         print("Please Make Sure: Datasets are less than 10MB")
         exit()
 
-    print("Imported {:d} DataFrame(s)\n" .format(len(df)))
+    print("Imported {:d} DataFrame(s)\n".format(len(df)))
 
     print("---Removing Unnecessary Column(s) From Dataset(s)---\n")
 
-    for idx, val in enumerate(df):
-        if any(item in remove for item in list(val.columns)):  # found unnecessary column
+    for idx in range(len(df)):
+        if any(item in remove for item in df[idx].columns.values):  # found unnecessary column
             for eraser in remove:
-                df[idx] = val.drop(eraser, axis=1)
+                if eraser.isdigit():
+                    df[idx].drop(df[idx].columns[[int(eraser)]], axis=1, inplace=True)  # drop by position
+                elif np.where(df[idx].columns.values == eraser):
+                    df[idx].drop(df[idx].columns[np.where(df[idx].columns.values == eraser)[0]], axis=1, inplace=True)
 
     # PreProcessing
     print("PreProcess: Searching Missing Values and Filling Them")
@@ -126,6 +131,10 @@ if __name__ == "__main__":
 
     print("PreProcess: Describing The Datasets")
     output = preprocess.describe(new_df)
+
+    print("PreProcess: Finding Correlations")
+    this_target = target[0]
+    output, corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), str(this_target))
 
     fileName = str(input_path[0]).replace('.csv', '').replace('.xlsx', '')  # remove extension
     write(fileName, output)
