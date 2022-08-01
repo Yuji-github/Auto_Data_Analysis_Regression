@@ -344,6 +344,7 @@ def adj_r_squared(df, target, dummy):
            <h2>Regression Results</h2>
            <table class="table_center"> 
            <tr>
+           <th>Column Name</th>
            <th>R-squared</th>
            <th>Adj. R-squared</th>
            <th>F-statistic</th>
@@ -368,14 +369,20 @@ def adj_r_squared(df, target, dummy):
 
         output += '''
                     <tr>
+                    <td>{:s}</td>
                     <td>{:5f}</td>
                     <td>{:5f}</td> 
                     <td>{:5f}</td>
                     <td>{:5f}</td>   
                     </tr>                         
-                    '''.format(olsr_model_results.rsquared, olsr_model_results.rsquared_adj, olsr_model_results.fvalue, olsr_model_results.f_pvalue)
-        if olsr_model_results.f_pvalue < 0.05: # reject H0
-            corr_list.append(dummy)
+                    '''.format(dum, olsr_model_results.rsquared, olsr_model_results.rsquared_adj, olsr_model_results.fvalue, olsr_model_results.f_pvalue)
+
+        if len(df_with_dummies.columns) <= 2:  # Bivariate
+            if olsr_model_results.rsquared_adj > 0.1:  # this value is depends. There is no right/wrong threshold for r-squared
+                corr_list.append(dum)
+        else:  # ANOVA
+            if olsr_model_results.f_pvalue < 0.05: # reject H0: all variables are the same:
+                corr_list.append(dum)
 
     output+='''
             </table>

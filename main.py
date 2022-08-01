@@ -129,30 +129,31 @@ if __name__ == "__main__":
                 elif np.where(df[idx].columns.values == eraser):
                     df[idx].drop(df[idx].columns[np.where(df[idx].columns.values == eraser)[0]], axis=1, inplace=True)
 
-    this_target = str(target[0])
-    print("---PreProcessing---\n")
+    for idx in range(len(df)):  # assume multiple files are given
+        this_target = str(target[idx])
+        print("---PreProcessing---\n")
 
-    # PreProcessing
-    print("PreProcess: Searching Missing Values and Filling Them\n")
-    new_df = preprocess.miss(df[0])
+        # PreProcessing
+        print("PreProcess: Searching Missing Values and Filling Them\n")
+        new_df = preprocess.miss(df[idx])
 
-    print("PreProcess: Describing The Datasets\n")
-    output = preprocess.describe(new_df, this_target)
+        print("PreProcess: Describing The Datasets\n")
+        output = preprocess.describe(new_df, this_target)
 
-    print("PreProcess: Finding Correlations\n")
-    output, corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target)
+        print("PreProcess: Finding Correlations\n")
+        output, corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target)
 
-    if dummy:
-        print("PreProcess: Adjusted R-Squared")
-        output, corr_category = preprocess.adj_r_squared(df[0], this_target, dummy)
+        if dummy:
+            print("PreProcess: Adjusted R-Squared\n")
+            output, corr_category = preprocess.adj_r_squared(df[idx], this_target, dummy)
 
-    print("PreProcess: Handling Outliers\n")
-    columns = list(new_df.columns.values)
-    columns.remove(this_target)
-    output, semi_final_df = preprocess.outlier(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target, corr_list if corr_list else columns)
+        print("PreProcess: Handling Outliers\n")
+        columns = list(new_df.columns.values)
+        columns.remove(this_target)
+        output, semi_final_df = preprocess.outlier(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target, corr_list if corr_list else columns)
 
-    final_df = pd.concat([semi_final_df, df[0][this_target]], axis=1)  # target added to the last column
+        final_df = pd.concat([semi_final_df, df[idx][this_target]], axis=1)  # target added to the last column
 
-    fileName = str(input_path[0]).replace('.csv', '').replace('.xlsx', '')  # remove extension
-    write(fileName, output)
-    open(fileName)
+        fileName = str(input_path[idx]).replace('.csv', '').replace('.xlsx', '')  # remove extension
+        write(fileName, output)
+        open(fileName)
