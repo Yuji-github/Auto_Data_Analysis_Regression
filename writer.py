@@ -30,6 +30,7 @@ def template(fileName):
 def write(fileName, val):
     # to open/create a new html file in the write mode
     f = open(fileName + '.html', 'w')
+
     # the html code which will go in the file GFG.html
     start, end = template(fileName)
     html_template = start + val + end
