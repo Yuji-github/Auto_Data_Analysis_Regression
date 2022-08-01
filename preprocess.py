@@ -1,11 +1,12 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.impute import KNNImputer
-from sklearn.impute import SimpleImputer
+import numpy as np
+import pandas as pd
 import seaborn as sns
 from scipy.stats.mstats import winsorize
+from sklearn.impute import KNNImputer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import MinMaxScaler
+import statsmodels.formula.api as smf
 
 output = '' # global
 
@@ -333,3 +334,52 @@ def outlier(df, target, corr_lis=None):
             '''
 
     return output, df
+
+def adj_r_squared(df, target, dummy):
+    corr_list = []  # to return
+    global output
+    output+='''
+           <section class="card">
+           <h1 id="h1">R-Squared with Dummy Variables</h1>
+           <h2>Regression Results</h2>
+           <table class="table_center"> 
+           <tr>
+           <th>R-squared</th>
+           <th>Adj. R-squared</th>
+           <th>F-statistic</th>
+           <th>Prob (F-statistic)</th>
+           </tr>  
+           '''
+
+    for dum in dummy:
+        df_with_dummies = pd.get_dummies(data=df[dum], columns=[dum])  # convert onehot
+        test = pd.concat([df[target], df_with_dummies], axis=1)
+
+        formula = '{:s} ~'.format(target)
+        for itr, val in enumerate(df_with_dummies.columns):  # creating formula
+            if itr == 0:
+                formula += str(val)
+            else:
+                formula += " + " + str(val)
+
+        olsr_model = smf.ols(formula=formula, data=test)
+        olsr_model_results = olsr_model.fit()
+        # olsr_model_results.save('summary_' + dum + 'pkl')
+
+        output += '''
+                    <tr>
+                    <td>{:5f}</td>
+                    <td>{:5f}</td> 
+                    <td>{:5f}</td>
+                    <td>{:5f}</td>   
+                    </tr>                         
+                    '''.format(olsr_model_results.rsquared, olsr_model_results.rsquared_adj, olsr_model_results.fvalue, olsr_model_results.f_pvalue)
+        if olsr_model_results.f_pvalue < 0.05: # reject H0
+            corr_list.append(dummy)
+
+    output+='''
+            </table>
+            </section>
+            '''
+
+    return output, corr_list

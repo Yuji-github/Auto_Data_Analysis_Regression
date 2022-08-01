@@ -8,7 +8,6 @@ import preprocess
 from reader import open
 import model
 
-
 if __name__ == "__main__":
 
     print("\nThis indicates an optimal machine learning model.\n"
@@ -23,6 +22,7 @@ if __name__ == "__main__":
                        help="Remove Column Name")  # assume multiple columns
     parse.add_argument("--Transpose", "-TR", default=False,
                        help="Transpose Dataset: Default is False")  # if datasets needs transpose, this should be True
+    parse.add_argument("--Dummy", "-D", help="Dummy Variables Name", nargs='+', action='append')
 
     # args
     args = parse.parse_args()
@@ -60,6 +60,8 @@ if __name__ == "__main__":
             remove = temp
         else:
             print("If the dataset includes ID's, it might affect the results\n")
+
+    dummy = np.array(args.Dummy).flatten()
 
     print("---Importing Dataset---\n")
 
@@ -140,10 +142,16 @@ if __name__ == "__main__":
     print("PreProcess: Finding Correlations\n")
     output, corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target)
 
+    if dummy:
+        print("PreProcess: Adjusted R-Squared")
+        output, corr_category = preprocess.adj_r_squared(df[0], this_target, dummy)
+
     print("PreProcess: Handling Outliers\n")
     columns = list(new_df.columns.values)
     columns.remove(this_target)
-    output, final_df = preprocess.outlier(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target, corr_list if corr_list else columns)
+    output, semi_final_df = preprocess.outlier(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target, corr_list if corr_list else columns)
+
+    final_df = pd.concat([semi_final_df, df[0][this_target]], axis=1)  # target added to the last column
 
     fileName = str(input_path[0]).replace('.csv', '').replace('.xlsx', '')  # remove extension
     write(fileName, output)
