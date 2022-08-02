@@ -54,44 +54,37 @@ def estimator():
 
     param1 = {}
     param1['fit_intercept'] = [True]
-    param1['classifier'] = [clf1]
 
     param2 = {}
     param2['alpha'] = [1e-3, 1e-2, 1e-1, 1, 10]
-    param2['classifier'] = [clf2]
 
     param3 = {}
     param3['alpha'] = [1e-3, 1e-2, 1e-1, 1, 10]
-    param3['classifier'] = [clf3]
 
     param4 = {}
-    param4['kernel'] = [DotProduct(), WhiteKernel(), RBF()]
+    param4['kernel'] = [RBF()]
     param4['alpha'] = [1e-10, 1e-5, 1e-1]
-    param4['classifier'] = [clf4]
 
     param5 = {}
     param5['radius'] = [1e-3, 1e-2, 1.0, 2.5, 5.0]
     param5['weights'] = ["uniform", "distance"]
     param5['p'] = [1, 2]
-    param5['classifier'] = [clf5]
 
     param6 = {}
     param6['hidden_layer_sizes'] = [4, 7, 12, 50, 100]  #   length = n_layers - 2
     param6['activation'] = ["identity", "logistic", "tanh", "relu"]
     param6['solver'] = ["lbfgs", "sgd", "adam"]
     param6['learning_rate_init'] = [1e-3, 1e-2, 1e-1]
-    param6['classifier'] = [clf6]
 
     param7 = {}
     param7['kernel'] = ['linear', 'rbf', 'sigmoid']
     param7['C'] = [0.0001, 0.001, 0.01, 0.1, 1, 5, 10]
     param7['epsilon'] = [1e-3, 1e-2, 1e-1, 1]
-    param7['classifier'] = [clf7]
 
-    pipeline = Pipeline([('classifier', clf1), ('classifier', clf2), ('classifier', clf3), ('classifier', clf4), ('classifier', clf5), ('classifier', clf6), ('classifier', clf7)])
+    clf = [clf1, clf2, clf3, clf4, clf5, clf6, clf7]
     params = [param1, param2, param3, param4, param5, param6, param7]
 
-    return pipeline, params
+    return clf, params
 
 def model_test(df, target):  # df contains only numercial variables
     split_config = [0.3, 0.2, 0.1]
@@ -139,8 +132,9 @@ def model_test(df, target):  # df contains only numercial variables
                     </tr>            
                     """.format(scaler)
 
-            pipeline, params = estimator()
-            gs = GridSearchCV(pipeline, params, cv=10, n_jobs=-1).fit(x_train, y_train)
+            clf, params = estimator()
+
+            gs = GridSearchCV(clf[3], params[3], cv=2, n_jobs=-1).fit(x_train, y_train)
             print(gs.best_params_)
             # linear = LinearRegression()
             # linear.fit(x_train, y_train)
