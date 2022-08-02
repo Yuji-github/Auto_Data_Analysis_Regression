@@ -137,14 +137,14 @@ def describe(df, target): # count num of describe df
             output+='''
                     <tr>
                     <td>{:s}</td>
-                    <td>{:5f}</td>
-                    <td>{:5f}</td> 
-                    <td>{:5f}</td> 
-                    <td>{:5f}</td> 
-                    <td>{:5f}</td> 
-                    <td>{:5f}</td> 
-                    <td>{:5f}</td> 
-                    <td>{:5f}</td>     
+                    <td>{:.5f}</td>
+                    <td>{:.5f}</td> 
+                    <td>{:.5f}</td> 
+                    <td>{:.5f}</td> 
+                    <td>{:.5f}</td> 
+                    <td>{:.5f}</td> 
+                    <td>{:.5f}</td> 
+                    <td>{:.5f}</td>     
                     </tr>
                     '''.format(desc.axes[1][idx],
                                desc.values.T[idx][0], desc.values.T[idx][1],
@@ -233,7 +233,7 @@ def correlation(df, target):
 
     for idx, val in enumerate(detail.values):
         output+='''
-                <td>{:5f}</td>   
+                <td>{:.5f}</td>   
                 '''.format(val)
         if val > 0.5 or val < -0.5:
             corr_list.append(detail.axes[0][idx])  # store column name which has moderate/strong correlations
@@ -311,8 +311,8 @@ def outlier(df, target, corr_lis=None):
               <th>Top</th>
               </tr>  
               <tr>
-              <td>{:2f} %</td>
-              <td>{:2f} %</td>    
+              <td>{:.2f} %</td>
+              <td>{:.2f} %</td>    
               </tr>
               </table>
               '''.format(win[0]*100, win[1]*100)
@@ -369,10 +369,10 @@ def adj_r_squared(df, target, dummy):
             output += '''
                         <tr>
                         <td>{:s}</td>
-                        <td>{:5f}</td>
-                        <td>{:5f}</td> 
-                        <td>{:5f}</td>
-                        <td>{:5f}</td>   
+                        <td>{:.5f}</td>
+                        <td>{:.5f}</td> 
+                        <td>{:.5f}</td>
+                        <td>{:.5f}</td>   
                         </tr>                         
                         '''.format(dum, olsr_model_results.rsquared, olsr_model_results.rsquared_adj, olsr_model_results.fvalue, olsr_model_results.f_pvalue)
 

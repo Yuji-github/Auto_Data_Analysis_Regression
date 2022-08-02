@@ -160,6 +160,7 @@ if __name__ == "__main__":
 
         output = preprocess_output + model_out
 
+        print("---Writing Report---\n")
         fileName = str(input_path[idx]).replace('.csv', '').replace('.xlsx', '')  # remove extension
         write(fileName, output)
         open(fileName)
