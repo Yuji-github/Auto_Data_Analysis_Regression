@@ -24,10 +24,11 @@ def transformer(x_train, x_test, num=1):
 
     return x_train, x_test
 
-def model_test(df, target):
-    # split_config = [0.3, 0.2, 0.1]
-    # trans_config = [1, 2, 3]
+def model_test(df, target):  # df contains only numercial variables
+    split_config = [0.3, 0.2, 0.1]
+    trans_config = [1, 2, 3]
     # for idx in range(3):
-    x_train, x_test, y_train, y_test = split_df(df, 0.2)  # default: 80% train
-    x_train, x_test = transformer(x_train, x_test, 1)  # default: StandardScaler
+    x_train, x_test, y_train, y_test = split_df(df, split_config[1])  # default: 80% train
+    x_train, x_test = transformer(x_train, x_test, trans_config[0])  # default: StandardScaler
+
 

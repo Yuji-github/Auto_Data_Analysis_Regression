@@ -143,16 +143,19 @@ if __name__ == "__main__":
         print("PreProcess: Finding Correlations\n")
         output, corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target)
 
-        if dummy:
+        if len(dummy) > 0:
             print("PreProcess: Adjusted R-Squared\n")
-            output, corr_category = preprocess.adj_r_squared(df[idx], this_target, dummy)
+            output = preprocess.adj_r_squared(df[idx], this_target, dummy)
 
         print("PreProcess: Handling Outliers\n")
         columns = list(new_df.columns.values)
         columns.remove(this_target)
         output, semi_final_df = preprocess.outlier(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target, corr_list if corr_list else columns)
 
+        # Model Searching
+        print("---Finding An Optimal Model---\n")
         final_df = pd.concat([semi_final_df, df[idx][this_target]], axis=1)  # target added to the last column
+
 
         fileName = str(input_path[idx]).replace('.csv', '').replace('.xlsx', '')  # remove extension
         write(fileName, output)

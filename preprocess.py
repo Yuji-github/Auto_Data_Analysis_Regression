@@ -336,7 +336,7 @@ def outlier(df, target, corr_lis=None):
     return output, df
 
 def adj_r_squared(df, target, dummy):
-    corr_list = []  # to return
+    # corr_list = []  # to return
     global output
     output+='''
            <section class="card">
@@ -353,40 +353,46 @@ def adj_r_squared(df, target, dummy):
            '''
 
     for dum in dummy:
-        df_with_dummies = pd.get_dummies(data=df[dum], columns=[dum])  # convert onehot
-        test = pd.concat([df[target], df_with_dummies], axis=1)
+        try:
+            df_with_dummies = pd.get_dummies(data=df[dum], columns=[dum])  # convert onehot
+            test = pd.concat([df[target], df_with_dummies], axis=1)
 
-        formula = '{:s} ~'.format(target)
-        for itr, val in enumerate(df_with_dummies.columns):  # creating formula
-            if itr == 0:
-                formula += str(val)
-            else:
-                formula += " + " + str(val)
+            formula = '{:s} ~'.format(target)
+            for itr, val in enumerate(df_with_dummies.columns):  # creating formula
+                if itr == 0:
+                    formula += str(val)
+                else:
+                    formula += " + " + str(val)
 
-        olsr_model = smf.ols(formula=formula, data=test)
-        olsr_model_results = olsr_model.fit()
-        # olsr_model_results.save('summary_' + dum + 'pkl')
+            olsr_model = smf.ols(formula=formula, data=test)
+            olsr_model_results = olsr_model.fit()
+            # olsr_model_results.save('summary_' + dum + '.pkl')
 
-        output += '''
-                    <tr>
-                    <td>{:s}</td>
-                    <td>{:5f}</td>
-                    <td>{:5f}</td> 
-                    <td>{:5f}</td>
-                    <td>{:5f}</td>   
-                    </tr>                         
-                    '''.format(dum, olsr_model_results.rsquared, olsr_model_results.rsquared_adj, olsr_model_results.fvalue, olsr_model_results.f_pvalue)
+            output += '''
+                        <tr>
+                        <td>{:s}</td>
+                        <td>{:5f}</td>
+                        <td>{:5f}</td> 
+                        <td>{:5f}</td>
+                        <td>{:5f}</td>   
+                        </tr>                         
+                        '''.format(dum, olsr_model_results.rsquared, olsr_model_results.rsquared_adj, olsr_model_results.fvalue, olsr_model_results.f_pvalue)
 
-        if len(df_with_dummies.columns) <= 2:  # Bivariate
-            if olsr_model_results.rsquared_adj > 0.1:  # this value is depends. There is no right/wrong threshold for r-squared
-                corr_list.append(dum)
-        else:  # ANOVA
-            if olsr_model_results.f_pvalue < 0.05: # reject H0: all variables are the same:
-                corr_list.append(dum)
+            # if len(df_with_dummies.columns) <= 2:  # Bivariate
+            #     if olsr_model_results.rsquared_adj > 0.1:  # this value is depends. There is no right/wrong threshold for r-squared
+            #         corr_list.append(dum)
+            # else:  # ANOVA
+            #     if olsr_model_results.f_pvalue < 0.05: # reject H0: all variables are the same:
+            #         corr_list.append(dum)
+
+        except KeyError:   # given name is not existing
+            print("Given {:s} is Not Existing\n".format(dum))
 
     output+='''
             </table>
+            <p>*Those Columns Will Be Removed For Finding An Optimal Model Because Thresholds Are Depends</p>
+            <p>The Details Are Saved On Local Computer. File Name: Summary_*.pkl  * is the column name</p>
             </section>
             '''
 
-    return output, corr_list
+    return output #, corr_list
