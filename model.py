@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
-from sklearn.neighbors import RadiusNeighborsRegressor
+from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
@@ -46,9 +46,10 @@ def estimator():
     clf1 = LinearRegression()
     clf2 = Ridge(random_state=0)
     clf3 = Lasso(random_state=0)
-    clf4 = RadiusNeighborsRegressor()
+    clf4 = AdaBoostRegressor(random_state=0)
     clf5 = MLPRegressor(random_state=0)
     clf6 = SVR()
+    clf7 = RandomForestRegressor(random_state=0)
 
     param1 = {}
     param1['fit_intercept'] = [True]
@@ -60,23 +61,28 @@ def estimator():
     param3['alpha'] = [1e-3, 1e-2, 1e-1, 1, 10]
 
     param4 = {}
-    param4['radius'] = [1e-3, 1e-2, 1.0, 2.0]
-    param4['weights'] = ["uniform", "distance"]
-    param4['p'] = [1, 2]
+    param4['n_estimators'] = [10, 50, 100]
+    param4['learning_rate'] = [1, 1.2, 1.5]
 
     param5 = {}
     param5['hidden_layer_sizes'] = [7, 12, 50, 100]  # length = n_layers - 2
     param5['activation'] = ["tanh", "relu"]
     param5['solver'] = ["sgd", "adam"]
+    param5['max_iter'] = [10, 50, 100, 200]
+    param5['early_stopping'] = [True]
     param5['learning_rate_init'] = [1e-3, 1e-2, 1e-1]
 
     param6 = {}
-    param6['kernel'] = ['rbf', 'sigmoid']
+    param6['kernel'] = ['linear', 'rbf', 'sigmoid']
     param6['C'] = [1]
     param6['epsilon'] = [0.1]
 
-    clf = [clf1, clf2, clf3, clf4, clf5, clf6]
-    params = [param1, param2, param3, param4, param5, param6]
+    param7 = {}
+    param7['n_estimators'] = [10, 50, 100]
+    param7['max_depth'] = [3, 5, None]
+
+    clf = [clf1, clf2, clf3, clf4, clf5, clf6, clf7]
+    params = [param1, param2, param3, param4, param5, param6, param7]
 
     return clf, params
 
