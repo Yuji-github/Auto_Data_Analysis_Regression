@@ -1,14 +1,13 @@
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel, RBF
 from sklearn.neighbors import RadiusNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
 import math
+import joblib
+from tqdm import tqdm
 
 output = '' # global
 
@@ -47,10 +46,9 @@ def estimator():
     clf1 = LinearRegression()
     clf2 = Ridge(random_state=0)
     clf3 = Lasso(random_state=0)
-    clf4 = GaussianProcessRegressor(random_state=0)
-    clf5 = RadiusNeighborsRegressor()
-    clf6 = MLPRegressor(random_state=0)
-    clf7 = SVR()
+    clf4 = RadiusNeighborsRegressor()
+    clf5 = MLPRegressor(random_state=0)
+    clf6 = SVR()
 
     param1 = {}
     param1['fit_intercept'] = [True]
@@ -62,27 +60,23 @@ def estimator():
     param3['alpha'] = [1e-3, 1e-2, 1e-1, 1, 10]
 
     param4 = {}
-    param4['kernel'] = [RBF()]
-    param4['alpha'] = [1e-10, 1e-5, 1e-1]
+    param4['radius'] = [1e-3, 1e-2, 1.0, 2.0]
+    param4['weights'] = ["uniform", "distance"]
+    param4['p'] = [1, 2]
 
     param5 = {}
-    param5['radius'] = [1e-3, 1e-2, 1.0, 2.5, 5.0]
-    param5['weights'] = ["uniform", "distance"]
-    param5['p'] = [1, 2]
+    param5['hidden_layer_sizes'] = [7, 12, 50, 100]  # length = n_layers - 2
+    param5['activation'] = ["tanh", "relu"]
+    param5['solver'] = ["sgd", "adam"]
+    param5['learning_rate_init'] = [1e-3, 1e-2, 1e-1]
 
     param6 = {}
-    param6['hidden_layer_sizes'] = [4, 7, 12, 50, 100]  #   length = n_layers - 2
-    param6['activation'] = ["identity", "logistic", "tanh", "relu"]
-    param6['solver'] = ["lbfgs", "sgd", "adam"]
-    param6['learning_rate_init'] = [1e-3, 1e-2, 1e-1]
+    param6['kernel'] = ['rbf', 'sigmoid']
+    param6['C'] = [1]
+    param6['epsilon'] = [0.1]
 
-    param7 = {}
-    param7['kernel'] = ['linear', 'rbf', 'sigmoid']
-    param7['C'] = [0.0001, 0.001, 0.01, 0.1, 1, 5, 10]
-    param7['epsilon'] = [1e-3, 1e-2, 1e-1, 1]
-
-    clf = [clf1, clf2, clf3, clf4, clf5, clf6, clf7]
-    params = [param1, param2, param3, param4, param5, param6, param7]
+    clf = [clf1, clf2, clf3, clf4, clf5, clf6]
+    params = [param1, param2, param3, param4, param5, param6]
 
     return clf, params
 
@@ -111,6 +105,8 @@ def model_test(df, target):  # df contains only numercial variables
               <P> {:s} </p>
               """.format(X, Y)
 
+    best_best = 0
+
     for idx in range(3):
         x_train, x_test, y_train, y_test = split_df(df, split_config[idx])  # default: 80% train
         output += """
@@ -132,29 +128,28 @@ def model_test(df, target):  # df contains only numercial variables
                     </tr>            
                     """.format(scaler)
 
+            # Finding the Best Model and Parameters
             clf, params = estimator()
+            best_score = 0
+            best_model_name = ''
+            for itr in tqdm(range(len(clf))):
+                gs = GridSearchCV(clf[itr], params[itr], cv=2, n_jobs=-1).fit(x_train, y_train)
+                if gs.best_score_ > best_score:
+                    joblib.dump(gs, 'best.pkl')  # save best one
+                    best_score = gs.best_score_
+                    best_model_name = str(clf[itr])
 
-            gs = GridSearchCV(clf[3], params[3], cv=2, n_jobs=-1).fit(x_train, y_train)
-            print(gs.best_params_)
-            # linear = LinearRegression()
-            # linear.fit(x_train, y_train)
-            # eval(y_test, linear.predict(x_test), "LinearRegression")
-            #
-            # ridge = RidgeCV(alphas=[1e-3, 1e-2, 1e-1, 1, 10], cv=10)
-            # ridge.fit(x_train, y_train)
-            # eval(y_test, ridge.predict(x_test), "Ridge")
-            #
-            # lasso = LassoCV(cv=10, random_state=0)
-            # lasso.fit(x_train, y_train)
-            # eval(y_test, lasso.predict(x_test), "Lasso")
-            #
-            # elastic = ElasticNetCV(cv=10, random_state=0)
-            # elastic.fit(x_train, y_train)
-            # eval(y_test, elastic.predict(x_test), "ElasticNet")
+            model = joblib.load("best.pkl")
+            if model.best_score_ > best_best:
+                joblib.dump(model, 'best_best.pkl')
+                best_best = model.best_score_
 
-            output+="""   
-                    </table>  
-                    """
+            eval(y_test, model.predict(x_test), best_model_name.replace('()', ''))
+
+            output+="""                       
+                    </table>
+                    <h3>Best Parameters: {:s}</h3>  
+                    """.format(str(model.best_params_))
 
     output+="""     
             </section>  

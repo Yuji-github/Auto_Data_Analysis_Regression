@@ -11,6 +11,7 @@ def template(fileName):
             h1{text-align: center; font-size: 30px}
             p {text-align: center; font-size: 20px; color: #000000}
             h2{text-align: center;}
+            h3{text-align: center;}
             .founder{text-align: center;  margin-left: auto; margin-right: auto;}
             </style>
         </head>
