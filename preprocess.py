@@ -177,8 +177,6 @@ def describe(df, target): # count num of describe df
            </section>                       
            '''.format(target)
 
-    return output
-
 def correlation(df, target):
     cor = df.corr()
     cor = cor.dropna(0, how='all')  # drop nan "rows" if the row contains nan only
@@ -260,7 +258,7 @@ def correlation(df, target):
                 </section>
                 '''.format(len(corr_list), target)
 
-    return output, corr_list
+    return corr_list
 
 def outlier(df, target, corr_lis=None):
     df = df.drop(target, 1)  # drop target
@@ -390,9 +388,9 @@ def adj_r_squared(df, target, dummy):
 
     output+='''
             </table>
-            <p>*Those Columns Will Be Removed For Finding An Optimal Model Because Thresholds Are Depends</p>
+            <p>*Those Columns Will Be Removed For Finding An Optimal Model Because The Thresholds Depend On</p>
             <p>The Details Are Saved On Local Computer. File Name: Summary_*.pkl  * is the column name</p>
             </section>
             '''
 
-    return output #, corr_list
+    # return corr_list

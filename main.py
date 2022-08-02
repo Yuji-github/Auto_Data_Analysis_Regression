@@ -138,24 +138,27 @@ if __name__ == "__main__":
         new_df = preprocess.miss(df[idx])
 
         print("PreProcess: Describing The Datasets\n")
-        output = preprocess.describe(new_df, this_target)
+        preprocess.describe(new_df, this_target)
 
         print("PreProcess: Finding Correlations\n")
-        output, corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target)
+        corr_list = preprocess.correlation(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target)
 
         if len(dummy) > 0:
             print("PreProcess: Adjusted R-Squared\n")
-            output = preprocess.adj_r_squared(df[idx], this_target, dummy)
+            preprocess.adj_r_squared(df[idx], this_target, dummy)
 
         print("PreProcess: Handling Outliers\n")
         columns = list(new_df.columns.values)
         columns.remove(this_target)
-        output, semi_final_df = preprocess.outlier(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target, corr_list if corr_list else columns)
+        preprocess_output, semi_final_df = preprocess.outlier(new_df.select_dtypes(exclude=["bool_", "object_"]), this_target, corr_list if corr_list else columns)
 
         # Model Searching
         print("---Finding An Optimal Model---\n")
         final_df = pd.concat([semi_final_df, df[idx][this_target]], axis=1)  # target added to the last column
 
+        model_out = model.model_test(final_df, this_target)
+
+        output = preprocess_output + model_out
 
         fileName = str(input_path[idx]).replace('.csv', '').replace('.xlsx', '')  # remove extension
         write(fileName, output)
