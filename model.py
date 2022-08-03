@@ -74,11 +74,11 @@ def estimator():
 
     param6 = {}
     param6['kernel'] = ['linear', 'rbf', 'sigmoid']
-    param6['C'] = [1]
-    param6['epsilon'] = [0.1]
+    param6['C'] = [0.001, 0.1, 1]
+    param6['epsilon'] = [0.001, 0.1, 0.1]
 
     param7 = {}
-    param7['n_estimators'] = [10, 50, 100]
+    param7['n_estimators'] = [10, 50, 100, 150]
     param7['max_depth'] = [3, 5, None]
 
     clf = [clf1, clf2, clf3, clf4, clf5, clf6, clf7]
@@ -109,9 +109,17 @@ def model_test(df, target):  # df contains only numercial variables
               <h2> Data Info</h2>
               <P> {:s} </p>
               <P> {:s} </p>
+              <h2>Applied Models</h2>
+              <P>Linear Models: LinearRegression, Ridge, Lasso</p>
+              <P>Ensemble Models: AdaBoost, Random Forest</p>
+              <P>SVM Models: SVR</p>
+              <P>Neural Network Models: MLPRegressor</p>
               """.format(X, Y)
 
-    best_best = 0
+    best_best = 0.0
+    best_best_name = ''
+    best_data_size = 0
+    best_best_parm = {}
 
     for idx in range(3):
         x_train, x_test, y_train, y_test = split_df(df, split_config[idx])  # default: 80% train
@@ -146,9 +154,14 @@ def model_test(df, target):  # df contains only numercial variables
                     best_model_name = str(clf[itr])
 
             model = joblib.load("best.pkl")
+
+            # store the best of the best model
             if model.best_score_ > best_best:
                 joblib.dump(model, 'best_best.pkl')
                 best_best = model.best_score_
+                best_best_name = str(model.estimator)
+                best_data_size = split_config[idx]
+                best_best_parm = model.best_params_
 
             eval(y_test, model.predict(x_test), best_model_name.replace('()', ''))
 
@@ -160,6 +173,19 @@ def model_test(df, target):  # df contains only numercial variables
     output+="""     
             </section>  
             """
+
+    best_out='''
+            <section class="card">
+            <h1 id="h1">Best Model</h1>
+            <h3>Best Model: {:s}</h3> 
+            <h3>Best Parameters: {:s}</h3> 
+            <h3>Best Data Size: {:d}</h3> 
+            <h3>Best Score R2: {:.3f}</h3> 
+            </section>  
+            '''.format(best_best_name, str(best_best_parm), int(best_data_size), best_best)
+
+    output = best_out + output  # switch orders
+
     return output
 
 def eval(y_true, y_pred, modelName):

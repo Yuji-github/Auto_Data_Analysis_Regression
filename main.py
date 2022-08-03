@@ -30,6 +30,10 @@ if __name__ == "__main__":
 
     input_path = np.array(args.InputFile).flatten()  # make 1D array
     for itr in input_path:
+        if not os.path.exists("./" + itr):  # create path folder
+            print('Creating A Folder')
+            os.mkdir("./" + itr)
+
         if "./None" in itr or not os.path.exists(itr):
             print("File is Not Given Properly, Please Provide a Correct File Name")
             print("Example: -I ./folder/FileName.csv")
@@ -131,6 +135,7 @@ if __name__ == "__main__":
 
     for idx in range(len(df)):  # assume multiple files are given
         this_target = str(target[idx])
+
         print("---PreProcessing---\n")
 
         # PreProcessing
@@ -164,3 +169,22 @@ if __name__ == "__main__":
         fileName = str(input_path[idx]).replace('.csv', '').replace('.xlsx', '')  # remove extension
         write(fileName, output)
         open(fileName)
+
+        # delete best.pkl file
+        os.remove("best.pkl")
+
+        # compress the folder
+        items = os.listdir("./")  # get all items
+        compress_list = [names for names in items if names.endswith(".pkl")
+                         or names for names in items if names.endswith(".png")
+                         or names for names in items if names.endswith(".html")
+                         ]  # store all pkl, png, and html
+
+        for move in compress_list:
+            os.replace(move, fileName + '/' + move)
+
+        with py7zr.SevenZipFile("./" + fileName + '.7z', 'w') as archive:
+            archive.writeall('./' + fileName)  # create 7z folder
+
+        # delete an unnecessary folder
+        os.rmdir(fileName)

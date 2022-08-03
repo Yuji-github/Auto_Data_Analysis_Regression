@@ -364,7 +364,7 @@ def adj_r_squared(df, target, dummy):
 
             olsr_model = smf.ols(formula=formula, data=test)
             olsr_model_results = olsr_model.fit()
-            # olsr_model_results.save('summary_' + dum + '.pkl')
+            olsr_model_results.save('summary_' + dum + '.pkl')
 
             output += '''
                         <tr>
