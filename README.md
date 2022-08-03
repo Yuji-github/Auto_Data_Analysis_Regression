@@ -73,9 +73,9 @@ The best model is saved in a 7z file, and named 'best_best.pkl'
 The model tests different regression models to find the optimal one. To obtain the best one, the model applies 4 different scalers, which include the standard scaler. Then, store the local best model to find a global best model to suggest it to users.
 
 ### After
-All results are saved in the local folder. If you want to check it again, please run the deompress.py file.  
-main.py -I demo.csv  <- analysis the dataset  
-deompress.py -F demo.7z <- show the result again  
+All results are saved in the local folder. If you want to check it again, please run the deompress.py file.<br>
+main.py -I demo.csv  <- analysis the dataset<br>
+deompress.py -F demo.7z <- show the result again<br>
 
 ## 4. Future Study 
 This model suggests one of the best models. However, the best model would be different when you use different data preprocessing and analysis.
