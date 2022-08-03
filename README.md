@@ -12,7 +12,7 @@ One of the daily challenges for data scientists is selecting an optimal model. T
 pip install openpyxl
 ```
 
-### Compression: HDBSCAN (with GPU)
+### Analysis Regression
 ```shell
 python main.py -I demo.csv -T AveragePrice -R 0 Date -D type region
 ```
@@ -25,5 +25,10 @@ python main.py --help
 ### Re-Open Browser
 Example:
 ```shell
-python decompression.py -F demo.7z
+python decompress.py -F demo.7z
+```
+
+For the more details of parameters, please run:
+```shell
+python decompress.py --help
 ```
