@@ -353,12 +353,18 @@ def adj_r_squared(df, target, dummy):
            </tr>  
            '''
 
+    def replace(x):  # replace - to prevent error
+        if '-' in str(x):
+            x = str(x).replace("-", "_")
+        return x
+
     for dum in dummy:
         if dum in df.columns:
+                df[dum] = df[dum].apply(replace)  # smf cannot handle '-'
                 df_with_dummies = pd.get_dummies(data=df[dum], columns=[dum])  # convert onehot
                 test = pd.concat([df[target], df_with_dummies], axis=1)
 
-                formula = '{:s} ~'.format(target)
+                formula = '{:s} ~ '.format(target)
                 for itr, val in enumerate(df_with_dummies.columns):  # creating formula
                     if itr == 0:
                         formula += str(val)
