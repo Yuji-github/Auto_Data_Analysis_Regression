@@ -13,7 +13,8 @@ One of the daily challenges for data scientists is selecting an optimal model. T
 pip install openpyxl
 ```
 
-### Analysis Regression: Run
+## 2. Execution
+### Analysis Regression
 ```shell
 python main.py -I demo.csv -T AveragePrice -R 0 Date -D type region
 ```
