@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parse.add_argument("--Transpose", "-TR", default=False,
                        help="Transpose Dataset: Default is False")  # if datasets needs transpose, this should be True
     parse.add_argument("--Dummy", "-D", help="Dummy Variables Name", nargs='+', action='append')
-    parse.add_argument("--Neural", "-N", default=False, help="Apply Neural Networks for Gridsearch")
+    parse.add_argument("--Neural", "-N", default=False, help="True: Apply Neural Networks for Gridsearch")
 
     # args
     args = parse.parse_args()

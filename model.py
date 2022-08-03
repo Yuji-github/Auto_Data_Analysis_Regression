@@ -124,6 +124,7 @@ def model_test(df, target, Neural):  # df contains only numercial variables
     best_best_name = ''
     best_data_size = 0
     best_best_parm = {}
+    best_best_scaler = ''
 
     for idx in range(len(split_config)):
         x_train, x_test, y_train, y_test = split_df(df, split_config[idx])  # default: 80% train
@@ -147,7 +148,7 @@ def model_test(df, target, Neural):  # df contains only numercial variables
                     """.format(scaler)
 
             # Finding the Best Model and Parameters
-            clf, params = estimator()
+            clf, params = estimator(Neural)
             best_score = 0
             best_model_name = ''
             for itr in tqdm(range(len(clf))):
@@ -166,6 +167,7 @@ def model_test(df, target, Neural):  # df contains only numercial variables
                 best_best_name = str(model.estimator)
                 best_data_size = (1 - split_config[idx])*100
                 best_best_parm = model.best_params_
+                best_best_scaler = scaler
 
             eval(y_test, model.predict(x_test), best_model_name.replace('()', ''))
 
@@ -182,11 +184,12 @@ def model_test(df, target, Neural):  # df contains only numercial variables
             <section class="card">
             <h1 id="h1">Best Model</h1>
             <h3>Best Model: {:s}</h3> 
+            <h3>Best Scaler: {:s}</h3>
             <h3>Best Parameters: {:s}</h3> 
             <h3>Best Data Size: {:d}</h3> 
-            <h3>Best Score R2: {:.3f}</h3> 
+            <h3>Best Score: {:.3f}</h3>              
             </section>  
-            '''.format(best_best_name, str(best_best_parm), int(best_data_size), best_best)
+            '''.format(best_best_name, best_best_scaler, str(best_best_parm), int(best_data_size), best_best)
 
     output = best_out + output  # switch orders
 
