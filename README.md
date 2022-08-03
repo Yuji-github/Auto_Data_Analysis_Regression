@@ -37,7 +37,7 @@ python decompress.py --help
 
 ## 3. Explain 
 
-
+https://user-images.githubusercontent.com/52090852/182607974-e3633cf0-36b1-4a6f-85f9-184e19dbd38f.mp4
 
 ### Missing Values
 <img src="./src/missing.png" alt="demo miss" title="auto miss">
