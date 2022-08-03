@@ -60,3 +60,9 @@ Using the side-by-side plots, the model visualizes outliers effectively and calc
 
 <img src="./src/out2.png" alt="demo outliers2" title="auto outliers2">
 If the percentage is over 5%, the model automatically applies Winsorizing to minimize number of outliers.
+
+### Suggeesting The Best Model
+<img src="./src/best.png" alt="demo best" title="auto best">
+To find the best model with given datasets, the model uses Griedsearch. The model shows the best model, hyper-parameters, and the propotion of tain datasets. The selection is based on the scores, which are provided by sklearn as an attibute.
+
+*If users want to include neural networks in the gridsearch, please provide "-N True", and it might take a lot of time to find the best one.
