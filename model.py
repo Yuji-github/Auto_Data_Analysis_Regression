@@ -68,7 +68,7 @@ def estimator():
     param5['hidden_layer_sizes'] = [7, 12, 50, 100]  # length = n_layers - 2
     param5['activation'] = ["tanh", "relu"]
     param5['solver'] = ["sgd", "adam"]
-    param5['max_iter'] = [10, 50, 100, 200]
+    param5['max_iter'] = [10, 50, 100, 200, 500]
     param5['early_stopping'] = [True]
     param5['learning_rate_init'] = [1e-3, 1e-2, 1e-1]
 
