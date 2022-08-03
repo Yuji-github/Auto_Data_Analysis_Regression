@@ -7,6 +7,8 @@ from writer import write
 import preprocess
 from reader import open
 import model
+import time
+import shutil
 
 if __name__ == "__main__":
 
@@ -30,9 +32,10 @@ if __name__ == "__main__":
 
     input_path = np.array(args.InputFile).flatten()  # make 1D array
     for itr in input_path:
-        if not os.path.exists("./" + itr):  # create path folder
-            print('Creating A Folder')
-            os.mkdir("./" + itr)
+        fileName = str(itr).replace('.csv', '').replace('.xlsx', '')  # remove extension
+        if not os.path.exists("./" + fileName):  # create path folder
+            print('Creating A Folder\n')
+            os.mkdir("./" + fileName)
 
         if "./None" in itr or not os.path.exists(itr):
             print("File is Not Given Properly, Please Provide a Correct File Name")
@@ -173,12 +176,14 @@ if __name__ == "__main__":
         # delete best.pkl file
         os.remove("best.pkl")
 
+        time.sleep(2)  # to allow change dir
+
         # compress the folder
         items = os.listdir("./")  # get all items
-        compress_list = [names for names in items if names.endswith(".pkl")
-                         or names for names in items if names.endswith(".png")
-                         or names for names in items if names.endswith(".html")
-                         ]  # store all pkl, png, and html
+        compress_list = []
+        for names in items:
+            if names.endswith("pkl") or names.endswith("png") or names.endswith("html"):
+                compress_list.append(names) # store all pkl, png, and html
 
         for move in compress_list:
             os.replace(move, fileName + '/' + move)
@@ -187,4 +192,4 @@ if __name__ == "__main__":
             archive.writeall('./' + fileName)  # create 7z folder
 
         # delete an unnecessary folder
-        os.rmdir(fileName)
+        shutil.rmtree(fileName, ignore_errors=True)

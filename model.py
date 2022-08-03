@@ -74,8 +74,8 @@ def estimator():
 
     param6 = {}
     param6['kernel'] = ['linear', 'rbf', 'sigmoid']
-    param6['C'] = [0.001, 0.1, 1]
-    param6['epsilon'] = [0.001, 0.1, 0.1]
+    param6['C'] = [0.1, 1]
+    param6['epsilon'] = [0.01, 1]
 
     param7 = {}
     param7['n_estimators'] = [10, 50, 100, 150]
@@ -121,13 +121,13 @@ def model_test(df, target):  # df contains only numercial variables
     best_data_size = 0
     best_best_parm = {}
 
-    for idx in range(3):
+    for idx in range(len(split_config)):
         x_train, x_test, y_train, y_test = split_df(df, split_config[idx])  # default: 80% train
         output += """
                     <h2> Training Info: Train Dataset {:.2f}</h2>
                     """.format((1 - split_config[idx]))
 
-        for i in range(4):
+        for i in range(len(trans_config)):
             x_train, x_test, scaler = transformer(x_train, x_test, trans_config[i])  # default: StandardScaler
             output+="""
                     <P> Applied Scaler: {:s} </p>  
@@ -147,9 +147,9 @@ def model_test(df, target):  # df contains only numercial variables
             best_score = 0
             best_model_name = ''
             for itr in tqdm(range(len(clf))):
-                gs = GridSearchCV(clf[itr], params[itr], cv=2, n_jobs=-1).fit(x_train, y_train)
+                gs = GridSearchCV(clf[itr], params[itr], cv=2, n_jobs=-1).fit(x_train, y_train)  #  n_jobs=-1 is using all CPUs
                 if gs.best_score_ > best_score:
-                    joblib.dump(gs, 'best.pkl')  # save best one
+                    joblib.dump(gs, 'best.pkl')  # save a local best one
                     best_score = gs.best_score_
                     best_model_name = str(clf[itr])
 
@@ -160,7 +160,7 @@ def model_test(df, target):  # df contains only numercial variables
                 joblib.dump(model, 'best_best.pkl')
                 best_best = model.best_score_
                 best_best_name = str(model.estimator)
-                best_data_size = split_config[idx]
+                best_data_size = (1 - split_config[idx])*100
                 best_best_parm = model.best_params_
 
             eval(y_test, model.predict(x_test), best_model_name.replace('()', ''))
