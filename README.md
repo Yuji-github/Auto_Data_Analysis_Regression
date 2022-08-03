@@ -42,7 +42,7 @@ Auto Analysis detects missing values as its first step, and it visualizes them w
 If any missing values are detected, the model automatically applies KNN-imputation for numerical variables and mode for categorical variables.
 
 ### Descriptive Statistics
-<img src="./src/descriptive.png" alt="demo Descriptive" title="auto Descriptive">
+<img src="./src/descriptive .png" alt="demo Descriptive" title="auto Descriptive">
 Auto Analysis displays the descriptive statistics and the target behavior with a box plot quickly.
 
 ### Correlation
