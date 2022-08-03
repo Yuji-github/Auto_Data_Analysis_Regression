@@ -38,6 +38,25 @@ python decompress.py --help
 ## 3. Explain 
 ### Missing Values
 <img src="./src/missing.png" alt="demo miss" title="auto miss">
-
 Auto Analysis detects missing values as its first step, and it visualizes them with a bar plot.
-If any missing values are detected, the model applies KNN-imputation for numerical variables and mode for categorical variables.
+If any missing values are detected, the model automatically applies KNN-imputation for numerical variables and mode for categorical variables.
+
+### Descriptive Statistics
+<img src="./src/descriptive.png" alt="demo Descriptive" title="auto Descriptive">
+Auto Analysis displays the descriptive statistics and the target behavior with a box plot quickly.
+
+### Correlation
+<img src="./src/corr.png" alt="demo correlation" title="auto correlation">
+Auto Analysis displays the entire correlation with a heatmap and then goes to a one-step deeper analysis. The bar plot shows the correlations between the target and other numerical variables. The model sets up a strong threshold with 0.7 and -0.7 and a moderate threshold with 0.5 and -0.5. The table shows the correlation values.
+
+### R-Squared with Dummy Variables
+<img src="./src/r_squared.png" alt="demo R_Squared " title="auto R_Squared">
+This is an optional step. The model can discover the relationships between the target and categorical variables if the model receives any value.
+However, the thresholds depend on the situations, and the model will drop off any categorical columns when it finds an optimal model.
+
+### Outliers
+<img src="./src/out1.png" alt="demo outliers1" title="auto outliers1">
+Using the side-by-side plots, the model visualizes outliers effectively and calculates the percentage of outliers.
+
+<img src="./src/out2.png" alt="demo outliers2" title="auto outliers2">
+If the percentage is over 5%, the model automatically applies Winsorizing to minimize number of outliers.
