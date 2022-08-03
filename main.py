@@ -39,13 +39,16 @@ if __name__ == "__main__":
 
         if "./None" in itr or not os.path.exists(itr):
             print("File is Not Given Properly, Please Provide a Correct File Name")
-            print("Example: -I ./folder/FileName.csv")
+            print("Example: -I FileName.csv")
             exit()
 
     target = np.array(args.Target).flatten()
     if len(target) == 0:
         print("Target is Not given, Please Provide a Target Column Name")
         print("Example: -T Target")
+        exit()
+    elif len(target) != len(input_path):
+        print("Target and Given Datasets Must Be the Same Length")
         exit()
 
     remove = np.array(args.Remove).flatten()
