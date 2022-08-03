@@ -25,6 +25,7 @@ if __name__ == "__main__":
     parse.add_argument("--Transpose", "-TR", default=False,
                        help="Transpose Dataset: Default is False")  # if datasets needs transpose, this should be True
     parse.add_argument("--Dummy", "-D", help="Dummy Variables Name", nargs='+', action='append')
+    parse.add_argument("--Neural", "-N", default=False, help="Apply Neural Networks for Gridsearch")
 
     # args
     args = parse.parse_args()
@@ -113,11 +114,13 @@ if __name__ == "__main__":
 
                 try:
                     temp = pd.read_excel(itr, sheet_name=sheet_name, header=0)
+                    if args.Transpose == True:  # if transpose is True
+                        temp = temp.T
+                    df.append(temp)
                 except ValueError:
                     print("Something Wrong with Given Name(s)")
                     print("Imported the First Sheet Only")
                     temp = pd.read_excel(itr, header=0)
-
                     if args.Transpose == True:  # if transpose is True
                         temp = temp.T
                     df.append(temp)
@@ -167,7 +170,7 @@ if __name__ == "__main__":
         print("---Finding An Optimal Model---\n")
         final_df = pd.concat([semi_final_df, df[idx][this_target]], axis=1)  # target added to the last column
 
-        model_out = model.model_test(final_df, this_target)
+        model_out = model.model_test(final_df, this_target, args.Neural)
 
         output = preprocess_output + model_out
 

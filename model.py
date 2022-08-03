@@ -42,14 +42,13 @@ def transformer(x_train, x_test, num=1):
 
     return x_train, x_test, scaler
 
-def estimator():
+def estimator(Neural):
     clf1 = LinearRegression()
     clf2 = Ridge(random_state=0)
     clf3 = Lasso(random_state=0)
     clf4 = AdaBoostRegressor(random_state=0)
-    clf5 = MLPRegressor(random_state=0)
-    clf6 = SVR()
-    clf7 = RandomForestRegressor(random_state=0)
+    clf5 = SVR()
+    clf6 = RandomForestRegressor(random_state=0)
 
     param1 = {}
     param1['fit_intercept'] = [True]
@@ -65,28 +64,33 @@ def estimator():
     param4['learning_rate'] = [1, 1.2, 1.5]
 
     param5 = {}
-    param5['hidden_layer_sizes'] = [7, 12, 50, 100]  # length = n_layers - 2
-    param5['activation'] = ["tanh", "relu"]
-    param5['solver'] = ["sgd", "adam"]
-    param5['max_iter'] = [10, 50, 100, 200, 500]
-    param5['early_stopping'] = [True]
-    param5['learning_rate_init'] = [1e-3, 1e-2, 1e-1]
+    param5['kernel'] = ['linear', 'rbf', 'sigmoid']
+    param5['C'] = [0.1, 1]
+    param5['epsilon'] = [0.01, 1]
 
     param6 = {}
-    param6['kernel'] = ['linear', 'rbf', 'sigmoid']
-    param6['C'] = [0.1, 1]
-    param6['epsilon'] = [0.01, 1]
+    param6['n_estimators'] = [10, 50, 100, 150]
+    param6['max_depth'] = [3, 5, None]
 
-    param7 = {}
-    param7['n_estimators'] = [10, 50, 100, 150]
-    param7['max_depth'] = [3, 5, None]
+    if Neural == True:
+        clf7 = MLPRegressor(random_state=0)
+        param7 = {}
+        param7['hidden_layer_sizes'] = [7, 12, 50, 100]  # length = n_layers - 2
+        param7['activation'] = ["tanh", "relu"]
+        param7['solver'] = ["sgd", "adam"]
+        param7['max_iter'] = [10, 50, 100, 200, 500]
+        param7['early_stopping'] = [True]
+        param7['learning_rate_init'] = [1e-3, 1e-2, 1e-1]
 
-    clf = [clf1, clf2, clf3, clf4, clf5, clf6, clf7]
-    params = [param1, param2, param3, param4, param5, param6, param7]
+        clf = [clf1, clf2, clf3, clf4, clf5, clf6, clf7]
+        params = [param1, param2, param3, param4, param5, param6, param7]
+    else:
+        clf = [clf1, clf2, clf3, clf4, clf5, clf6]
+        params = [param1, param2, param3, param4, param5, param6]
 
     return clf, params
 
-def model_test(df, target):  # df contains only numercial variables
+def model_test(df, target, Neural):  # df contains only numercial variables
     split_config = [0.3, 0.2, 0.1]
     trans_config = [1, 2, 3, 4]
 
@@ -113,7 +117,7 @@ def model_test(df, target):  # df contains only numercial variables
               <P>Linear Models: LinearRegression, Ridge, Lasso</p>
               <P>Ensemble Models: AdaBoost, Random Forest</p>
               <P>SVM Models: SVR</p>
-              <P>Neural Network Models: MLPRegressor</p>
+              <P>Neural Network Models: MLPRegressor *if Neural is True</p>
               """.format(X, Y)
 
     best_best = 0.0
