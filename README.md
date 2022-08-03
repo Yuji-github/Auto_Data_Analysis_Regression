@@ -35,3 +35,9 @@ For the more details of parameters, please run:
 python decompress.py --help
 ```
 
+## 3. Explain 
+### Missing Values
+<img src="./src/missing.png" alt="demo miss" title="auto miss">
+
+Auto Analysis detects missing values as its first step, and it visualizes them with a bar plot.
+If any missing values are detected, the model applies KNN-imputation for numerical variables and mode for categorical variables.
