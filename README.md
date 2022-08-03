@@ -36,6 +36,9 @@ python decompress.py --help
 ```
 
 ## 3. Explain 
+
+https://user-images.githubusercontent.com/52090852/182599905-9c93e551-c437-4e21-8708-6846c6f0729d.mp4
+
 ### Missing Values
 <img src="./src/missing.png" alt="demo miss" title="auto miss">
 Auto Analysis detects missing values as its first step, and it visualizes them with a bar plot.
