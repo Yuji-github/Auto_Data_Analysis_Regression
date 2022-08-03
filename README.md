@@ -65,9 +65,16 @@ If the percentage is over 5%, the model automatically applies Winsorizing to min
 <img src="./src/best.png" alt="demo best" title="auto best">
 To find the best model with given datasets, the model uses Griedsearch. The model shows the best model, hyper-parameters, and the propotion of tain datasets. The selection is based on the scores, which are provided by sklearn as an attibute.
 
-*If users want to include neural networks in the gridsearch, please provide "-N True", and it might take a lot of time to find the best one.
+*If users want to include neural networks in the gridsearch, please provide "-N True", and it might take a lot of time to find the best one.<br>
 The best model is saved in a 7z file, and named 'best_best.pkl'
 
 ### Model Selection
 <img src="./src/selection.png" alt="demo selection" title="auto selection">
 The model tests different regression models to find the optimal one. To obtain the best one, the model applies 4 different scalers, which include the standard scaler. Then, store the local best model to find a global best model to suggest it to users.
+
+### After
+All results are saved in the local folder. If you want to check it again, please run the deompress.py file. 
+
+main.py -I demo.csv  <- analysis the dataset
+
+deompress.py -F demo.7z <- show the result again
