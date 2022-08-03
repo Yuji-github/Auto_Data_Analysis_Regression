@@ -10,7 +10,7 @@ One of the daily challenges for data scientists is selecting an optimal model. T
 
 ### Install:
 ```shell
-pip install openpyxl
+pip install -r requirements.txt 
 ```
 
 ## 2. Execution
