@@ -79,5 +79,4 @@ deompress.py -F demo.7z <- show the result again
 
 ## 4. Future Study 
 This model suggests one of the best models. However, the best model would be different when you use different data preprocessing and analysis.
-Example: [ayami-n](https://github.com/ayami-n/DataMining_with-several-Regression-model/blob/main/Avocado_Project.ipynb)
-The author found SVR is better than Random Forest when the author splits the datasets by region.
+For example, [ayami-n](https://github.com/ayami-n/DataMining_with-several-Regression-model/blob/main/Avocado_Project.ipynb) found SVR is better than Random Forest when the author splits the datasets by region.
