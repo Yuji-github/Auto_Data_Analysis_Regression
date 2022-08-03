@@ -176,8 +176,8 @@ if __name__ == "__main__":
 
         print("---Writing Report---\n")
         fileName = str(input_path[idx]).replace('.csv', '').replace('.xlsx', '')  # remove extension
-        write(fileName, output)
-        open(fileName)
+        write(fileName, output)  # saving file as html
+        open(fileName)  # open html on a browser
 
         # delete best.pkl file
         os.remove("best.pkl")
