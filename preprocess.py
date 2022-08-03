@@ -337,7 +337,9 @@ def adj_r_squared(df, target, dummy):
     # if none of dummies is not this df -> return
     if not any(item in dummy for item in df.columns.values):
         return
-    if df.select_dtypes(exclude=["number", "bool_"]) == 0:
+
+    obj_df = df.select_dtypes(exclude=["number", "bool_"])
+    if obj_df.size == 0:
         return
 
     global output
